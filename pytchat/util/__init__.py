@@ -19,6 +19,37 @@ CLIENT_VERSION = ''.join(("2.", (datetime.datetime.today() - datetime.timedelta(
 
 UA = config.headers["user-agent"]
 
+def _channelid_via_oembed(video_id: str) -> str | None:
+    """Try to resolve a channel ID using YouTube's oEmbed endpoint."""
+    oembed_url = (
+        "https://www.youtube.com/oembed"
+        f"?url=https://www.youtube.com/watch?v={quote(video_id)}&format=json"
+    )
+    try:
+        with httpx.Client(timeout=10) as client:
+            resp = client.get(oembed_url)
+            if resp.status_code != 200:
+                return None
+
+            author_url = resp.json().get("author_url", "")
+            if not author_url:
+                return None
+
+            # author_url is usually .../channel/UCxxxxxxxx
+            match = _CHANNEL_ID_RE.search(author_url)
+            if match:
+                return match.group(1)
+
+            # Handle newer @handle-style author_url by resolving the about page.
+            if "/@" in author_url:
+                about_resp = client.get(author_url + "/about", follow_redirects=True)
+                match2 = re.search(r'"externalId":"(UC[0-9A-Za-z_-]{22})"', about_resp.text)
+                if match2:
+                    return match2.group(1)
+    except Exception:
+        return None
+
+    return None
 
 def save(data, filename, extention) -> str:
     save_filename = filename + "_" + \
@@ -90,15 +121,22 @@ def extract_video_id(url_or_id: str) -> str:
 
 
 def get_channelid(client, video_id):
-    resp = client.get(f"https://www.youtube.com/embed/{video_id}", headers=config.headers)  
-    match = re.search(PATTERN_CHANNEL, resp.text)
+    """Drop-in replacement for pytchat.util.get_channelid with an oEmbed-first strategy."""
+    channel_id = _channelid_via_oembed(video_id)
+    if channel_id:
+        return channel_id
+
+    # Fall back to pytchat's original scraping logic (handles edge cases
+    # oEmbed can't, e.g. some unlisted/members-only streams).
     try:
-        if match is None:
-            raise IndexError
-        ret = match.group(1)
-    except IndexError:
-        ret = get_channelid_2nd(client, video_id)
-    return ret
+        return _original_get_channelid(client, video_id)
+    except InvalidVideoIdException:
+        # Re-raise with a clearer message since both strategies failed.
+        raise InvalidVideoIdException(
+            f"Cannot find channel id for video id:{video_id}. "
+            "Both oEmbed and HTML-scrape lookups failed."
+        )
+
 
 
 def get_channelid_2nd(client, video_id):

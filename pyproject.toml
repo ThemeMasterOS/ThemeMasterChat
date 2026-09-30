@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pytchat-ng"
-version = "0.5.9"
+version = "0.6.0"
 description = "a python library for fetching youtube live chat. (next generation)"
 readme = "README.md"
 license = "MIT"
