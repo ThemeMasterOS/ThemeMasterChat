@@ -3,21 +3,20 @@ requires = ["setuptools>=64", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pytchat-ng"
-version = "0.6.0"
-description = "a python library for fetching youtube live chat. (next generation)"
+name = "thememasterchat"
+version = "0.1.0.0"
+description = "a python library for fetching youtube live chat (fork of pytchat-ng, imports as pytchat)."
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 authors = [
-    {name = "revertical", email = "screenkidgreen7@gmail.com"},
+    {name = "Theme Master"},
 ]
 keywords = ["youtube", "livechat", "asyncio"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
 ]
@@ -32,7 +31,7 @@ test = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/revertical/pytchat-ng"
+Homepage = "https://github.com/ThemeMasterOS/ThemeMasterChat"
 
 [tool.setuptools.packages.find]
 exclude = ["tests*", "testrun*"]

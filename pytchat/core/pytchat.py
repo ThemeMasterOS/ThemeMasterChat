@@ -89,7 +89,7 @@ class PytchatCore:
         self._exception_holder = None
         self._parser = Parser(
             is_replay=self._is_replay,
-            exception_holder=[None] if hold_exception else None
+            exception_holder=self._exception_holder
         )
         self._first_fetch = replay_continuation is None
         self._fetch_url = config._sml if replay_continuation is None else config._smr
@@ -168,7 +168,7 @@ class PytchatCore:
                 reload_continuation = self._parser.reload_continuation(
                     self._parser.get_contents(livechat_json)[0])
                 if reload_continuation:
-                    livechat_json = (self._get_livechat_json(reload_continuation, client, replay=headers is not None, offset_ms=0))
+                    livechat_json = (self._get_livechat_json(reload_continuation, client, replay=True, offset_ms=0))
                 contents, _ = self._parser.get_contents(livechat_json)
                 self._is_replay = True
             self._first_fetch = False
@@ -188,7 +188,8 @@ class PytchatCore:
                 response = client.post(self._fetch_url, json=param)
                 livechat_json = response.json()
                 break
-            except (json.JSONDecodeError, httpx.ConnectTimeout, httpx.ReadTimeout, httpx.ConnectError) as e:
+            except (json.JSONDecodeError, httpx.ConnectTimeout, httpx.ReadTimeout, httpx.ConnectError,
+                    httpx.ReadError, httpx.RemoteProtocolError) as e:
                 err = e
                 time.sleep(2)
                 continue
@@ -220,8 +221,6 @@ class PytchatCore:
     def raise_for_status(self):
         if self._exception_holder is not None:
             raise self._exception_holder
-        if self._parser.exception_holder is not None:
-            raise self._parser.exception_holder[0]
 
     def _raise_exception(self, exception: Exception = None):
         self.terminate()

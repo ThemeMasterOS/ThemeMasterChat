@@ -1,7 +1,9 @@
-pytchat-ng
-=======
+# ThemeMasterChat
 
-pytchat-ng is a python library for fetching youtube live chat (Next Generation).
+ThemeMasterChat is a python library for fetching youtube live chat.
+
+> Forked from [pytchat-ng](https://github.com/revertical/pytchat-ng) (revertical), itself forked from [pytchat](https://github.com/taizan-hokuto/pytchat) (taizan-hokuto). Import name stays `pytchat`.
+> Uninstall `pytchat` / `pytchat-ng` first: `pip uninstall pytchat pytchat-ng`
  
 
 <br><br><br>
@@ -19,7 +21,7 @@ For more detailed information, see [wiki](https://github.com/taizan-hokuto/pytch
 
 ## Install
 ```python
-pip install pytchat-ng
+pip install thememasterchat
 ```
 ## Examples
 

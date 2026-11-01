@@ -1,7 +1,9 @@
 import datetime
 import os
 import re
+from typing import Optional
 from urllib.parse import quote
+import httpx
 from .. import config
 from .. exceptions import InvalidVideoIdException
 
@@ -13,14 +15,22 @@ PATTERN_CHANNEL = re.compile(r"\\\"channelId\\\":\\\"(.{24})\\\"")
 
 PATTERN_M_CHANNEL = re.compile(r"\"channelId\":\"(.{24})\"")
 
+PATTERN_OEMBED_CHANNEL = re.compile(r"/channel/(UC[0-9A-Za-z_-]{22})")
+
+PATTERN_EXTERNAL_ID = re.compile(r'"externalId":"(UC[0-9A-Za-z_-]{22})"')
+
 YT_VIDEO_ID_LENGTH = 11
 
 CLIENT_VERSION = ''.join(("2.", (datetime.datetime.today() - datetime.timedelta(days=1)).strftime("%Y%m%d"), ".01.00"))
 
 UA = config.headers["user-agent"]
 
-def _channelid_via_oembed(video_id: str) -> str | None:
-    """Try to resolve a channel ID using YouTube's oEmbed endpoint."""
+def _channelid_via_oembed(video_id: str) -> Optional[str]:
+    """Try to resolve a channel ID using YouTube's oEmbed endpoint.
+
+    Returns None on any network/parse failure so the caller can fall back
+    to HTML scraping. Programming errors (NameError etc.) are NOT swallowed.
+    """
     oembed_url = (
         "https://www.youtube.com/oembed"
         f"?url=https://www.youtube.com/watch?v={quote(video_id)}&format=json"
@@ -36,20 +46,21 @@ def _channelid_via_oembed(video_id: str) -> str | None:
                 return None
 
             # author_url is usually .../channel/UCxxxxxxxx
-            match = _CHANNEL_ID_RE.search(author_url)
+            match = PATTERN_OEMBED_CHANNEL.search(author_url)
             if match:
                 return match.group(1)
 
-            # Handle newer @handle-style author_url by resolving the about page.
+            # Newer @handle-style author_url: resolve via the about page.
             if "/@" in author_url:
                 about_resp = client.get(author_url + "/about", follow_redirects=True)
-                match2 = re.search(r'"externalId":"(UC[0-9A-Za-z_-]{22})"', about_resp.text)
+                match2 = PATTERN_EXTERNAL_ID.search(about_resp.text)
                 if match2:
                     return match2.group(1)
-    except Exception:
+    except (httpx.HTTPError, ValueError, KeyError, AttributeError):
         return None
 
     return None
+
 
 def save(data, filename, extention) -> str:
     save_filename = filename + "_" + \
@@ -120,23 +131,32 @@ def extract_video_id(url_or_id: str) -> str:
     return ret
 
 
+def _original_get_channelid(client, video_id):
+    """Original pytchat lookup: scrape the embed page, then the mobile page."""
+    resp = client.get("https://www.youtube.com/embed/{}".format(quote(video_id)), headers=config.headers)
+    match = re.search(PATTERN_CHANNEL, resp.text)
+    try:
+        if match is None:
+            raise IndexError
+        ret = match.group(1)
+    except IndexError:
+        ret = get_channelid_2nd(client, video_id)
+    return ret
+
+
 def get_channelid(client, video_id):
-    """Drop-in replacement for pytchat.util.get_channelid with an oEmbed-first strategy."""
+    """Resolve a channel ID: oEmbed first, then the original HTML scraping."""
     channel_id = _channelid_via_oembed(video_id)
     if channel_id:
         return channel_id
 
-    # Fall back to pytchat's original scraping logic (handles edge cases
-    # oEmbed can't, e.g. some unlisted/members-only streams).
     try:
         return _original_get_channelid(client, video_id)
-    except InvalidVideoIdException:
-        # Re-raise with a clearer message since both strategies failed.
+    except InvalidVideoIdException as e:
         raise InvalidVideoIdException(
             f"Cannot find channel id for video id:{video_id}. "
             "Both oEmbed and HTML-scrape lookups failed."
-        )
-
+        ) from e
 
 
 def get_channelid_2nd(client, video_id):

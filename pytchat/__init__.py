@@ -1,14 +1,12 @@
 """
 pytchat is a lightweight python library to browse youtube livechat without Selenium or BeautifulSoup.
 """
-__copyright__    = 'Copyright (C) 2019, 2020, 2021 revertical'
+__copyright__    = 'Copyright (C) 2019, 2020, 2021 taizan-hokuto, revertical, Theme Master'
 __license__      = 'MIT'
-__author__       = 'revertical'
-__author_email__ = 'screenkidgreen7@gmail.com'
-__url__          = 'https://github.com/revertical/pytchat-ng'
+__version__      = '0.1.0.0'
+__author__       = 'Theme Master'
+__url__          = 'https://github.com/ThemeMasterOS/ThemeMasterChat'
 
-
-import platform
 
 from .exceptions import (
     ChatParseException,
@@ -42,14 +40,5 @@ from .api import (
     SuperchatCalculator,
     create
 )
-
-# Variables for readability reasons
-yes = True
-no = False
-nothing = None
-
-# Welcome user, because why not?
-
-print(f"pytchat loaded on {platform.system()} successufully!")
 
 # flake8: noqa
