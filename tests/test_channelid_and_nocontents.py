@@ -53,3 +53,34 @@ def test_pytchat_reports_nocontents_not_typeerror(monkeypatch):
     assert not chat.is_alive()
     with pytest.raises(exceptions.NoContents):
         chat.raise_for_status()
+
+
+def test_local_protocol_error_is_retried(monkeypatch):
+    """v0.1.0.1: a closed HTTP/2 connection (LocalProtocolError) is retried."""
+    import logging
+    import time as _time
+    monkeypatch.setattr(_time, "sleep", lambda s: None)
+
+    class FakeResp:
+        def json(self):
+            return {"ok": True}
+
+    class FakeClient:
+        def __init__(self):
+            self.calls = 0
+
+        def post(self, url, json=None):
+            self.calls += 1
+            if self.calls == 1:
+                raise httpx.LocalProtocolError("Invalid input RECV_PING in state CLOSED")
+            return FakeResp()
+
+    chat = object.__new__(Pytchat)
+    chat._fetch_url = "https://example.invalid"
+    chat._dat = ""
+    chat._video_id = VID
+    chat._logger = logging.getLogger("test")
+    client = FakeClient()
+    result = chat._get_livechat_json("token", client, replay=False)
+    assert result == {"ok": True}
+    assert client.calls == 2

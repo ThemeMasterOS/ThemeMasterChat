@@ -189,7 +189,7 @@ class PytchatCore:
                 livechat_json = response.json()
                 break
             except (json.JSONDecodeError, httpx.ConnectTimeout, httpx.ReadTimeout, httpx.ConnectError,
-                    httpx.ReadError, httpx.RemoteProtocolError) as e:
+                    httpx.ReadError, httpx.RemoteProtocolError, httpx.LocalProtocolError) as e:
                 err = e
                 time.sleep(2)
                 continue

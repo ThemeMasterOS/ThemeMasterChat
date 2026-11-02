@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "thememasterchat"
-version = "0.1.0.0"
+version = "0.1.0.1"
 description = "a python library for fetching youtube live chat (fork of pytchat-ng, imports as pytchat)."
 readme = "README.md"
 license = "MIT"
