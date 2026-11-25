@@ -1,9 +1,9 @@
 import asyncio
 import pytest
-import pytchat
+import thememasterchat
 from concurrent.futures import CancelledError
-from pytchat.core_multithread.livechat import LiveChat
-from pytchat.core_async.livechat import LiveChatAsync
+from thememasterchat.core_multithread.livechat import LiveChat
+from thememasterchat.core_async.livechat import LiveChatAsync
 
 cases = [
     {
@@ -30,7 +30,7 @@ cases = [
 def test_archived_stream():
     for case in cases:
         try:
-            stream = pytchat.create(video_id=case["video_id"], seektime=case["seektime"])
+            stream = thememasterchat.create(video_id=case["video_id"], seektime=case["seektime"])
         except Exception:
             pytest.skip("YouTube API unreachable or video unavailable")
         while stream.is_alive():

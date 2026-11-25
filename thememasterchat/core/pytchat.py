@@ -17,7 +17,7 @@ MAX_RETRY = 10
 class PytchatCore:
     '''
 
-    core pytchat object
+    core ThemeMasterChat object
 
     Parameter
     ---------

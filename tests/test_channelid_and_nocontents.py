@@ -1,8 +1,8 @@
 import httpx
 import pytest
-from pytchat import util, exceptions
-from pytchat.parser.live import Parser
-from pytchat.core.pytchat import PytchatCore as Pytchat
+from thememasterchat import util, exceptions
+from thememasterchat.parser.live import Parser
+from thememasterchat.core.pytchat import PytchatCore as Pytchat
 
 VID = "abcdefghijk"
 UC = "UC" + "a" * 22

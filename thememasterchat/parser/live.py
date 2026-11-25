@@ -1,5 +1,5 @@
 """
-pytchat.parser.live
+thememasterchat.parser.live
 ~~~~~~~~~~~~~~~~~~~
 Parser of live chat JSON.
 """

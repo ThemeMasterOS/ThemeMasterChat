@@ -1,6 +1,6 @@
 import json
-from pytchat.parser.live import Parser
-from pytchat.processors.speed.calculator import SpeedCalculator
+from thememasterchat.parser.live import Parser
+from thememasterchat.processors.speed.calculator import SpeedCalculator
 
 parser = Parser(is_replay=False)
 

@@ -1,6 +1,6 @@
 import json
-from pytchat.parser.live import Parser
-from pytchat.processors.compatible.processor import CompatibleProcessor
+from thememasterchat.parser.live import Parser
+from thememasterchat.processors.compatible.processor import CompatibleProcessor
 
 parser = Parser(is_replay=False)
 

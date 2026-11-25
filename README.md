@@ -2,13 +2,20 @@
 
 ThemeMasterChat is a python library for fetching youtube live chat.
 
-> Forked from [pytchat-ng](https://github.com/revertical/pytchat-ng) (revertical), itself forked from [pytchat](https://github.com/taizan-hokuto/pytchat) (taizan-hokuto). Import name stays `pytchat`.
-> Uninstall `pytchat` / `pytchat-ng` first: `pip uninstall pytchat pytchat-ng`
- 
+> Forked from [pytchat-ng](https://github.com/revertical/pytchat-ng) (revertical), itself forked from [pytchat](https://github.com/taizan-hokuto/pytchat) (taizan-hokuto). As of v0.1.1.0, the Python import package is `thememasterchat` (previously `pytchat`).
+> Upgrading from an older ThemeMasterChat release? `pip install -U thememasterchat` replaces its old `pytchat` import directory. You no longer need to uninstall the original `pytchat` / `pytchat-ng` to use ThemeMasterChat, but if they remain installed, `import pytchat` will resolve to those packages.
+
+> [!WARNING]
+> **Breaking change in v0.1.1.0:** the primary Python import changes from `pytchat` to `thememasterchat`.
+>
+> Before: `import pytchat`
+> After: `import thememasterchat`
+>
+> Existing scripts using `import pytchat` may need to be updated. If the original `pytchat` package is installed, `import pytchat` will load that package, not ThemeMasterChat. See [Compatibility alias](#compatibility-alias-for-existing-pytchat-code).
 
 <br><br><br>
 ## Description
-pytchat is a python library for fetching youtube live chat
+ThemeMasterChat is a python library for fetching youtube live chat
 without using Selenium or BeautifulSoup.
 
 Other features:
@@ -23,13 +30,29 @@ For more detailed information, see [wiki](https://github.com/taizan-hokuto/pytch
 ```python
 pip install thememasterchat
 ```
+
+## Import name and compatibility alias
+The installed package is ThemeMasterChat, imported from `thememasterchat`:
+```python
+import thememasterchat
+chat = thememasterchat.create(video_id="VIDEO_ID")
+```
+
+### Compatibility alias for existing `pytchat` code
+If you do not want to rename your existing `pytchat` references, use a local Python import alias:
+```python
+import thememasterchat as pytchat
+chat = pytchat.create(video_id="VIDEO_ID")
+```
+This is only a local Python import alias. The installed package is still ThemeMasterChat, imported from `thememasterchat`; the alias does not install or re-export the original `pytchat` package.
+
 ## Examples
 
 
 ### Fetch chat data (see [wiki](https://github.com/taizan-hokuto/pytchat/wiki/PytchatCore))
 ```python
-import pytchat
-chat = pytchat.create(video_id="uIx8l2xlYVY")
+import thememasterchat
+chat = thememasterchat.create(video_id="uIx8l2xlYVY")
 while chat.is_alive():
     for c in chat.get().sync_items():
         print(f"{c.datetime} [{c.author.name}]- {c.message}")
@@ -38,10 +61,10 @@ while chat.is_alive():
 
 ### Output JSON format string (feature of [DefaultProcessor](https://github.com/taizan-hokuto/pytchat/wiki/DefaultProcessor))
 ```python
-import pytchat
+import thememasterchat
 import time
 
-chat = pytchat.create(video_id="uIx8l2xlYVY")
+chat = thememasterchat.create(video_id="uIx8l2xlYVY")
 while chat.is_alive():
     print(chat.get().json())
     time.sleep(5)
@@ -82,12 +105,12 @@ Each item can be got with `sync_items()` function.
   <tr>
     <td>message</td>
     <td>str</td>
-    <td>emojis are represented by ":(shortcut text):"</td>
+    <td>Native emojis use Unicode where available; custom emojis use ":(shortcut text):". Full URLs are restored from navigation metadata when reliable.</td>
   </tr>
   <tr>
     <td>messageEx</td>
     <td>str</td>
-    <td>list of message texts and emoji dicts(id, txt, url).</td>
+    <td>list of message texts and emoji dicts(id, txt, url). Emoji txt uses shortcut text for compatibility.</td>
   </tr>
   <tr>
     <td>timestamp</td>

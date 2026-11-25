@@ -1,5 +1,5 @@
 import json
-from pytchat.processors.jsonfile_archiver import JsonfileArchiver
+from thememasterchat.processors.jsonfile_archiver import JsonfileArchiver
 from unittest.mock import patch, mock_open
 from tests.testdata.jsonfile_archiver.chat_component import chat_component
 

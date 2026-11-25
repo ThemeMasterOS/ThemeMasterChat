@@ -1,5 +1,5 @@
 import re
-from pytchat.processors.chat_processor import ChatProcessor
+from ..chat_processor import ChatProcessor
 
 superchat_regex = re.compile(r"^(\D*)(\d{1,3}(,\d{3})*(\.\d*)*\b)$")
 

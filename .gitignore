@@ -37,3 +37,21 @@ temporary/
 # Pypi wheel
 build/
 exclude/
+
+# Python bytecode
+*.py[cod]
+*$py.class
+
+# Additional test tools
+.tox/
+.nox/
+.hypothesis/
+
+# Python tooling caches
+.mypy_cache/
+.ruff_cache/
+
+# Packaging leftovers
+.eggs/
+wheels/
+pip-wheel-metadata/

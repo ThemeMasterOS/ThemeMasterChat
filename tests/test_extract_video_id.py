@@ -1,5 +1,5 @@
-from pytchat.util import extract_video_id
-from pytchat.exceptions import InvalidVideoIdException
+from thememasterchat.util import extract_video_id
+from thememasterchat.exceptions import InvalidVideoIdException
 
 VALID_TEST_PATTERNS = (
     ("ABC_EFG_IJK", "ABC_EFG_IJK"),

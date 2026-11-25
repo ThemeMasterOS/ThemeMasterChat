@@ -1,7 +1,7 @@
 import json
 from datetime import datetime
-from pytchat.parser.live import Parser
-from pytchat.processors.default.processor import DefaultProcessor
+from thememasterchat.parser.live import Parser
+from thememasterchat.processors.default.processor import DefaultProcessor
 
 
 TEST_TIMETSTAMP = 1570678496000000

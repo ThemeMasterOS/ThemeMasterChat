@@ -1,6 +1,6 @@
-from pytchat.parser.live import Parser
+from thememasterchat.parser.live import Parser
 import json
-from pytchat.exceptions import NoContents
+from thememasterchat.exceptions import NoContents
 
 
 parser = Parser(is_replay=False)

@@ -1,7 +1,7 @@
 import json
-from pytchat.parser.live import Parser
-from pytchat.processors.superchat.calculator import SuperchatCalculator
-from pytchat.exceptions import ChatParseException
+from thememasterchat.parser.live import Parser
+from thememasterchat.processors.superchat.calculator import SuperchatCalculator
+from thememasterchat.exceptions import ChatParseException
 parse = SuperchatCalculator()._parse
 
 
