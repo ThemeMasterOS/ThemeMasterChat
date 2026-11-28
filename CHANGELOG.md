@@ -2,6 +2,27 @@
 
 All notable changes to ThemeMasterChat are documented here.
 
+## [0.1.1.1] - 2026-11-28
+
+This release restores the original destination of YouTube redirect URLs used in chat navigation metadata.
+
+### Added
+
+- YouTube redirect unwrapping: when a chat URL's navigation metadata points to a `youtube.com/redirect` URL, the destination is extracted and percent-decoded from the `q` query parameter. This lets shortened chat URLs be restored to their real destination.
+- Tests for redirect unwrapping, percent-decoded destinations, missing or non-URL `q` values, non-YouTube hosts, and malformed redirect URLs.
+
+### Changed
+
+- Version bumped to `0.1.1.1`.
+- Redirect unwrapping is limited to `youtube.com` and `*.youtube.com` URLs whose path is `/redirect` and whose `q` value is an `http(s)` URL.
+- Direct navigation URLs still take precedence over unwrapped redirect destinations.
+- Other processors and public APIs are unchanged.
+
+### Compatibility
+
+- Redirect unwrapping only applies to the default renderer's URL restoration path.
+- Visible message text that is itself a YouTube redirect URL is left unchanged unless it can be restored through the existing navigation-metadata matching logic.
+
 ## [0.1.1.0] - 2026-11-26
 
 This release renames the Python import package to `thememasterchat` and improves how chat messages are rendered: native emojis now appear as real Unicode emojis, and shortened URLs are expanded back to their full form when YouTube provides reliable navigation metadata.
@@ -68,7 +89,7 @@ This is only a Python import alias; it does not install or re-export the origina
 - `PytchatCore` class name unchanged.
 - `thememasterchat/core/pytchat.py` module path unchanged.
 - Existing public exports (`create`, processors, archivers, exceptions, etc.) unchanged.
-- YouTube redirect URLs are **not** unwrapped.
+- YouTube redirect URLs were **not** unwrapped (changed in `0.1.1.1`).
 
 ### Documentation
 

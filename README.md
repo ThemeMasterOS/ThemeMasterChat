@@ -105,7 +105,7 @@ Each item can be got with `sync_items()` function.
   <tr>
     <td>message</td>
     <td>str</td>
-    <td>Native emojis use Unicode where available; custom emojis use ":(shortcut text):". Full URLs are restored from navigation metadata when reliable.</td>
+    <td>Native emojis use Unicode where available; custom emojis use ":(shortcut text):". Full URLs are restored from navigation metadata when reliable, including destinations decoded from YouTube redirect URLs.</td>
   </tr>
   <tr>
     <td>messageEx</td>

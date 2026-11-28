@@ -3,7 +3,7 @@ thememasterchat is a lightweight python library to browse youtube livechat witho
 """
 __copyright__    = 'Copyright (C) 2019, 2020, 2021 taizan-hokuto, revertical, Theme Master'
 __license__      = 'MIT'
-__version__      = '0.1.1.0'
+__version__      = '0.1.1.1'
 __author__       = 'Theme Master'
 __url__          = 'https://github.com/ThemeMasterOS/ThemeMasterChat'
 

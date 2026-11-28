@@ -155,6 +155,22 @@ def test_shortened_url_uses_matching_command_metadata_candidate():
     assert render([run]) == (FULL_URL, [FULL_URL])
 
 
+def test_direct_navigation_url_takes_precedence_over_redirect_destination():
+    run = {
+        "text": "https://example.com/some...",
+        "navigationEndpoint": {
+            "urlEndpoint": {
+                "url": "https://www.youtube.com/redirect?q=https%3A%2F%2Fexample.com%2Fsome%2Flong%2Furl"
+            },
+            "commandMetadata": {
+                "webCommandMetadata": {"url": "https://example.com/some/other"}
+            },
+        },
+    }
+
+    assert render([run]) == ("https://example.com/some/other", ["https://example.com/some/other"])
+
+
 def test_shortened_url_without_metadata_is_preserved():
     assert render([{"text": SHORT_URL}]) == (SHORT_URL, [SHORT_URL])
 
@@ -168,7 +184,7 @@ def test_non_matching_navigation_metadata_is_preserved():
     assert render([run]) == (SHORT_URL, [SHORT_URL])
 
 
-def test_redirect_navigation_metadata_is_not_unwrapped():
+def test_redirect_navigation_metadata_is_unwrapped():
     redirect_url = (
         "https://www.youtube.com/redirect?event=live_chat"
         "&q=https%3A%2F%2Fexample.com%2Fsome%2Flong%2Furl"
@@ -176,6 +192,80 @@ def test_redirect_navigation_metadata_is_not_unwrapped():
     run = {
         "text": "https://example.com/some...",
         "navigationEndpoint": {"urlEndpoint": {"url": redirect_url}},
+    }
+
+    assert render([run]) == (
+        "https://example.com/some/long/url",
+        ["https://example.com/some/long/url"],
+    )
+
+
+def test_redirect_q_parameter_is_percent_decoded():
+    destination = "https://test.com/hdufhfasasfueeeetstestetdggddh"
+    redirect_url = (
+        "https://www.youtube.com/redirect?event=live_chat"
+        "&redir_token=abc123&q=https%3A%2F%2Ftest.com%2Fhdufhfasasfueeeetstestetdggddh"
+    )
+    run = {
+        "text": "https://test.com/hdufhfasas...",
+        "navigationEndpoint": {"urlEndpoint": {"url": redirect_url}},
+    }
+
+    assert render([run]) == (destination, [destination])
+
+
+def test_redirect_destination_with_encoded_query_is_decoded():
+    destination = "https://example.com/search?q=a%26b&lang=en"
+    redirect_url = (
+        "https://www.youtube.com/redirect?q="
+        "https%3A%2F%2Fexample.com%2Fsearch%3Fq%3Da%2526b%26lang%3Den"
+    )
+    run = {
+        "text": "https://example.com/search?q=a...",
+        "navigationEndpoint": {"urlEndpoint": {"url": redirect_url}},
+    }
+
+    assert render([run]) == (destination, [destination])
+
+
+def test_redirect_without_destination_is_preserved():
+    run = {
+        "text": "https://example.com/some...",
+        "navigationEndpoint": {
+            "urlEndpoint": {"url": "https://www.youtube.com/redirect?event=live_chat"}
+        },
+    }
+
+    assert render([run]) == ("https://example.com/some...", ["https://example.com/some..."])
+
+
+def test_redirect_with_non_url_destination_is_preserved():
+    run = {
+        "text": "https://example.com/some...",
+        "navigationEndpoint": {
+            "urlEndpoint": {"url": "https://www.youtube.com/redirect?q=not-a-url"}
+        },
+    }
+
+    assert render([run]) == ("https://example.com/some...", ["https://example.com/some..."])
+
+
+def test_non_youtube_redirect_is_not_unwrapped():
+    redirect_url = (
+        "https://example.com/redirect?q=https%3A%2F%2Fexample.com%2Fsome%2Flong%2Furl"
+    )
+    run = {
+        "text": "https://example.com/some...",
+        "navigationEndpoint": {"urlEndpoint": {"url": redirect_url}},
+    }
+
+    assert render([run]) == ("https://example.com/some...", ["https://example.com/some..."])
+
+
+def test_malformed_redirect_url_does_not_raise():
+    run = {
+        "text": "https://example.com/some...",
+        "navigationEndpoint": {"urlEndpoint": {"url": "https://www.youtube.com/redirect?q=%"}},
     }
 
     assert render([run]) == ("https://example.com/some...", ["https://example.com/some..."])

@@ -1,4 +1,5 @@
 from datetime import datetime
+from urllib.parse import parse_qs, urlsplit
 
 
 class Author:
@@ -69,6 +70,28 @@ def _emoji_metadata(emoji):
     }
 
 
+def _unwrap_youtube_redirect(url):
+    try:
+        parts = urlsplit(url)
+    except ValueError:
+        return None
+    if parts.scheme not in ("http", "https"):
+        return None
+    host = (parts.hostname or "").lower()
+    if host != "youtube.com" and not host.endswith(".youtube.com"):
+        return None
+    if parts.path.rstrip("/") != "/redirect":
+        return None
+    query = parse_qs(parts.query)
+    destinations = query.get("q")
+    if not destinations:
+        return None
+    destination = destinations[0].strip()
+    if not destination.lower().startswith(("http://", "https://")):
+        return None
+    return destination
+
+
 def _navigation_urls(run):
     navigation_endpoint = run.get("navigationEndpoint")
     if not isinstance(navigation_endpoint, dict):
@@ -87,7 +110,12 @@ def _navigation_urls(run):
         if isinstance(candidate, str):
             candidate = candidate.strip()
             if candidate.startswith(("http://", "https://")):
-                urls.append(candidate)
+                if candidate not in urls:
+                    urls.append(candidate)
+    for url in list(urls):
+        unwrapped = _unwrap_youtube_redirect(url)
+        if unwrapped and unwrapped not in urls:
+            urls.append(unwrapped)
     return urls
 
 
